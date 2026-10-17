@@ -1,0 +1,49 @@
+name: PC Virtual Windows
+
+on:
+  workflow_dispatch: # roda quando você clicar em "Run"
+
+jobs:
+  windows-pc:
+    runs-on: windows-latest
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configurar PC - Hardware Bom
+        shell: powershell
+        run: |
+          Write-Host "=== MEU PC VIRTUAL WINDOWS ==="
+          Get-CimInstance Win32_ComputerSystem
+          Get-CimInstance Win32_OperatingSystem | Select Caption, Version, OSArchitecture
+          Write-Host "CPU:"
+          Get-CimInstance Win32_Processor | Select Name, NumberOfCores, NumberOfLogicalProcessors
+          Write-Host "RAM:"
+          Get-CimInstance Win32_PhysicalMemory | Measure-Object -Property Capacity -Sum
+
+      - name: Instalar Programas Essenciais
+        shell: powershell
+        run: |
+          # Instala via Chocolatey - o melhor pra Windows
+          choco install -y googlechrome vscode git python nodejs-lts 7zip vlc --no-progress
+          # Ativa WSL e Hyper-V
+          Enable-WindowsOptionalFeature -Online -FeatureName Microsoft-Hyper-V -All -NoRestart
+          Enable-WindowsOptionalFeature -Online -FeatureName Microsoft-Windows-Subsystem-Linux -NoRestart
+
+      - name: Criar Ambiente de Dev
+        shell: powershell
+        run: |
+          python --version
+          node --version
+          npm --version
+          git --version
+          # Cria pasta de trabalho
+          mkdir C:\DevPC -Force
+          echo "PC Virtual criado em: $(Get-Date)" > C:\DevPC\info.txt
+
+      - name: Manter PC ligado (para acesso remoto opcional)
+        if: always()
+        run: |
+          echo "PC ficará ligado por 6 horas"
+          sleep 21600
