@@ -1,15 +1,4 @@
-name: PC Virtual Windows
 
-on:
-  workflow_dispatch: # roda quando você clicar em "Run"
-
-jobs:
-  windows-pc:
-    runs-on: windows-latest
-    
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
 
       - name: Configurar PC - Hardware Bom
         shell: powershell
